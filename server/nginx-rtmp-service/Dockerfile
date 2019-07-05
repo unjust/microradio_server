@@ -3,4 +3,4 @@ FROM tiangolo/nginx-rtmp
 
 WORKDIR /
 RUN echo "------ hello current working dir is: $PWD"
-COPY radio_nginx.conf /etc/nginx/nginx.conf
+COPY radio_nginx_stunnel.conf /etc/nginx/nginx.conf

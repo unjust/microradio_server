@@ -28,8 +28,6 @@ fi
 echo "startup: create docker network  --------------- "
 sudo docker network create skynet
 
-cd /radio_config
-
 # create stunnel image on network with port exposed 19350
 stunnel_service=$(sudo docker ps -a -q -f "name=stunnel-service")
 if [ -n "$stunnel_service" ]
@@ -38,7 +36,7 @@ then
   sudo docker start $stunnel_service
 else
   echo "startup: creating stunnel container  --------------- "
-  sudo docker build -t stunnel-image stunnel-service
+  sudo docker build -t stunnel-image /radio_config/stunnel-service
   sudo docker run -d -p 19350:19350 \
     --network skynet \
     --name stunnel-service stunnel-image;
@@ -51,11 +49,11 @@ then
   sudo docker start $server
 else
   echo "startup: docker build radiomolecula-image --------------- "
-  sudo docker build -t radiomolecula-image nginx-rtmp-service
+  sudo docker build -t radiomolecula-image /radio_config/nginx-rtmp-service
   echo "startup: docker build radiomolecula-server  --------------- "
   sudo docker run -d -p 1935:1935 \
     --network skynet \
-    -e STUNNEL_URL=stunnel:19530 \
+    -e STUNNEL_URL=stunnel-service:19530 \
     --name radiomolecula-server radiomolecula-image;
 fi
 
