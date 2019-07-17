@@ -21,8 +21,6 @@ else
   sudo apt-get update
   sudo apt-get install -y docker-ce
 fi
-# sudo usermod -aG docker $USER
-# su - $USER
 
 # create network
 echo "startup: create docker network  --------------- "
