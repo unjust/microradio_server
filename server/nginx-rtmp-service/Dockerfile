@@ -2,5 +2,4 @@
 FROM tiangolo/nginx-rtmp
 
 WORKDIR /
-RUN echo "------ hello current working dir is: $PWD"
 COPY radio_nginx.conf /etc/nginx/nginx.conf
