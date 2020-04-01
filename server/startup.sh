@@ -12,7 +12,7 @@ if [ -n "$docker_version" -eq 0 ]
 then
   echo "startup: docker installed already --------------- "
 # https://fabianlee.org/2017/03/07/docker-installing-docker-ce-on-ubuntu-14-04-and-16-04/
-else 
+else
   sudo apt-get update
   sudo apt-get install linux-image-extra-virtual
   sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
@@ -58,4 +58,9 @@ else
 fi
 
 container_id=$(sudo docker ps -a -q -f "name=radiomolecula-server" -f "status=running")
-echo "startup: radiomolecula-server should be up ${container_id}"
+if [ -n "$container_id" ]
+then
+  echo "startup: radiomolecula-server should be up ${container_id}"
+else
+  echo "startup: error radiomolecula-server is NOT started"
+fi
