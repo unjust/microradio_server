@@ -1,0 +1,117 @@
+# note this is a template since you must
+# replace YOUTUBE_KEY and FB_KEY
+
+daemon off;                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                             
+worker_processes  auto;
+
+# error_log /dev/stdout info;       
+error_log  logs/error.log;
+
+# pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                     '$status $body_bytes_sent "$http_referer" '
+                     '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    # keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    # gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        # charset koi8-r;
+
+        access_log  logs/host.access.log;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        # error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+
+rtmp {
+    server {
+        listen 1935;
+        chunk_size 4096;
+
+        # application stream {                                                                                                        
+        #     live on;                                                                                                                
+                                                                                                                                    
+        #     exec ffmpeg -i rtmp://localhost:1935/stream/$name                                                                       
+        #       -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 2500k -f flv -g 30 -r 30 -s 1280x720 -preset superfast -profile:v baseline rtmp://localhost:1935/hls/$name_720p2628kbs
+        #       -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 1000k -f flv -g 30 -r 30 -s 854x480 -preset superfast -profile:v baseline rtmp://localhost:1935/hls/$name_480p1128kbs 
+        #       -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 750k -f flv -g 30 -r 30 -s 640x360 -preset superfast -profile:v baseline rtmp://localhost:1935/hls/$name_360p878kbs   
+        #       -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 400k -f flv -g 30 -r 30 -s 426x240 -preset superfast -profile:v baseline rtmp://localhost:1935/hls/$name_240p528kbs 
+        #       -c:a libfdk_aac -b:a 64k -c:v libx264 -b:v 200k -f flv -g 15 -r 15 -s 426x240 -preset superfast -profile:v baseline rtmp://localhost:1935/hls/$name_240p264kbs;
+        # }
+
+        application live {
+            live on;
+            record off;
+
+            # allow publishing from all (change this to your ip if you wish to lock to ip address)
+            allow publish all;
+
+            # uncomment this if you are going to deny every ip other than yours
+            # deny publish all;
+
+            # push to all sub applications we will create (one each for each application)
+            push rtmp://localhost/youtube;
+            push rtmp://localhost/facebook;
+
+        }
+
+        application youtube {
+            live on;
+            record off;
+
+            # only allow this machine to publish
+            allow publish 127.0.0.1;
+            deny publish all;
+
+            # push url, this will be your stream url and stream key together
+            push rtmp://x.rtmp.youtube.com/live2/${YOUTUBE_KEY};
+        }
+        
+        application facebook {
+            live on;
+            record off;
+
+            # only allow this machine to publish
+            allow publish 127.0.0.1;
+            deny publish all;
+
+            # push url, this will be your stream url and stream key together
+            # TODO: when envsubst works - for now hard code rtmp://$ENV{"STUNNEL_URL"}/rtmp/...
+            push rtmp://stunnel-service:19350/rtmp/${FB_KEY};
+        }
+
+    }
+}
