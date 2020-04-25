@@ -42,25 +42,26 @@ else
     --name stunnel-service stunnel-image;
 fi
 
-server=$(sudo docker ps -a -q -f "name=radiomolecula-server")
+server=$(sudo docker ps -a -q -f "name=stream-server")
 if [ -n "$server" ]
 then
-  echo "startup: restarting radiomolecula-server  --------------- "
+  echo "startup: restarting stream-server  --------------- "
   sudo docker start $server
 else
-  echo "startup: docker build radiomolecula-image --------------- "
-  sudo docker build -t radiomolecula-image nginx-rtmp-service
-  echo "startup: docker build radiomolecula-server  --------------- "
+  echo "startup: docker build stream-image --------------- "
+  sudo docker build -t stream-server-image nginx-rtmp-service
+  echo "startup: docker build stream-server  --------------- "
   sudo docker run -d -p 1935:1935 \
     --network skynet \
-    -e STUNNEL_URL=stunnel:19530 \
-    --name radiomolecula-server radiomolecula-image;
+    -e STUNNEL_URL=stunnel-service:19530 \
+    --env-file env_nginx \
+    --name stream-server stream-server-image;
 fi
 
-container_id=$(sudo docker ps -a -q -f "name=radiomolecula-server" -f "status=running")
+container_id=$(sudo docker ps -a -q -f "name=stream-server" -f "status=running")
 if [ -n "$container_id" ]
 then
-  echo "startup: radiomolecula-server should be up ${container_id}"
+  echo "startup: stream-server should be up ${container_id}"
 else
-  echo "startup: error radiomolecula-server is NOT started"
+  echo "startup: error stream-server is NOT started"
 fi
