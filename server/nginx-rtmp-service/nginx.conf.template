@@ -1,5 +1,5 @@
 # note this is a template since you must
-# replace YOUTUBE_KEY and FB_KEY
+# replace YOUTUBE_KEY, FACEBOOK_KEY, TWITCH_KEY, STUNNEL_URL
 
 daemon off;                                                                                                                                                                                                                                                          
                                                                                                                                                                                                                              
@@ -85,7 +85,7 @@ rtmp {
             # push to all sub applications we will create (one each for each application)
             push rtmp://localhost/youtube;
             push rtmp://localhost/facebook;
-
+            push rtmp://localhost/twitch;
         }
 
         application youtube {
@@ -109,9 +109,19 @@ rtmp {
             deny publish all;
 
             # push url, this will be your stream url and stream key together
-            # TODO: when envsubst works - for now hard code rtmp://$ENV{"STUNNEL_URL"}/rtmp/...
-            push rtmp://stunnel-service:19350/rtmp/${FB_KEY};
+            push rtmp://${STUNNEL_URL}/rtmp/${FACEBOOK_KEY};
         }
 
+        application twitch {
+            live on;
+            record off;
+
+            # only allow this machine to publish
+            allow publish 127.0.0.1;
+            deny publish all;
+
+            # push url, this will be your stream url and stream key together
+            push rtmp://live-sao.twitch.tv/app/${TWITCH_KEY};
+        }
     }
 }
