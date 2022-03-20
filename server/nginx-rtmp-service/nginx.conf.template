@@ -5,8 +5,10 @@ daemon off;
                                                                                                                                                                                                                              
 worker_processes  auto;
 
-# error_log /dev/stdout info;       
-error_log  logs/error.log;
+# error_log /dev/stdout info;   
+
+# changing names to distinguish new logs from default
+error_log  logs/my_error.log debug;
 
 # pid        logs/nginx.pid;
 
@@ -38,7 +40,7 @@ http {
 
         # charset koi8-r;
 
-        access_log  logs/host.access.log;
+        access_log  logs/my_access.log;
 
         location / {
             root   html;
@@ -61,6 +63,8 @@ rtmp {
         listen 1935;
         chunk_size 4096;
 
+        access_log  logs/rtmp.access.log;
+
         # application stream {                                                                                                        
         #     live on;                                                                                                                
                                                                                                                                     
@@ -74,7 +78,17 @@ rtmp {
 
         application live {
             live on;
-            record off;
+
+            record all;
+            record_suffix _recorded.flv;
+            record_path /tmp;
+
+            # note: wasn't recording until made changes, not sure if the general recorder object was key or not
+            recorder general {
+              record all;
+              record_suffix recording-%d-%b-%y-%T.flv;
+              record_path /tmp;
+            }
 
             # allow publishing from all (change this to your ip if you wish to lock to ip address)
             allow publish all;
@@ -83,9 +97,21 @@ rtmp {
             # deny publish all;
 
             # push to all sub applications we will create (one each for each application)
-            push rtmp://localhost/youtube;
-            push rtmp://localhost/facebook;
+            # push rtmp://localhost/youtube;
+            # push rtmp://localhost/facebook;
             push rtmp://localhost/twitch;
+        }
+
+        application facebook {
+            live on;
+            record off;
+
+            # only allow this machine to publish
+            allow publish 127.0.0.1;
+            deny publish all;
+
+            # push url, this will be your stream url and stream key together
+            push rtmp://${STUNNEL_URL}/rtmp/${FACEBOOK_KEY};
         }
 
         application youtube {
@@ -99,18 +125,6 @@ rtmp {
             # push url, this will be your stream url and stream key together
             push rtmp://x.rtmp.youtube.com/live2/${YOUTUBE_KEY};
         }
-        
-        application facebook {
-            live on;
-            record off;
-
-            # only allow this machine to publish
-            allow publish 127.0.0.1;
-            deny publish all;
-
-            # push url, this will be your stream url and stream key together
-            push rtmp://${STUNNEL_URL}/rtmp/${FACEBOOK_KEY};
-        }
 
         application twitch {
             live on;
@@ -121,7 +135,8 @@ rtmp {
             deny publish all;
 
             # push url, this will be your stream url and stream key together
-            push rtmp://live-sao.twitch.tv/app/${TWITCH_KEY};
+            # param to test bandwidthtest bandwidthtest=true
+            push rtmp://live-sao.twitch.tv/app/${TWITCH_STREAM_KEY}?bandwidthtest=true;
         }
     }
 }
