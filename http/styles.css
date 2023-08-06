@@ -1,0 +1,120 @@
+.logo {
+    margin: 25px 0 0 60px;
+    width: 120px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding-left: 140px;
+}
+
+.bottom-bar {
+    display: flex;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    height: 80px;
+    border-top: solid 1px black;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.envivo {
+    width: fit-content;
+    padding: 0 25px;
+    background-color: black;
+    color: white;
+    height: 100%;
+    text-align: center;
+    line-height: 80px;
+    font-size: 3em;
+    font-weight: bolder;
+}
+
+nav {
+    font-size: 50px;
+    font-weight: bolder;
+    text-transform: uppercase;
+}
+
+.tacha {
+    text-decoration: line-through;
+}
+
+.slider {
+    -webkit-appearance: none;
+    /* Override default CSS styles */
+    appearance: none;
+    width: 100%;
+    /* Full-width */
+    height: 6px;
+    /* Specified height */
+    background: #000;
+    /* Grey background */
+    outline: none;
+    /* Remove outline */
+    /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s;
+    /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.volume input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: black;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.volume {
+    line-height: 76px;
+    width: 260px;
+}
+
+.play-button {
+    display: none;
+}
+
+.maquinado {
+    font-size: .8em;
+    /* width: 100%; */
+    position: absolute;
+    bottom: 85px;
+    right: 10px;
+    text-align: right;
+}
+
+.playpause {
+    width: 120px;
+}
+
+.player {
+    position: absolute;
+    width: 640px;
+    /* height: 190px; */
+    top: 0;
+    right: 0;
+}
+
+.player img {
+    width: 100%;
+}
+
+.player ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.player li {
+    float: left;
+    padding-right: 25px;
+}
